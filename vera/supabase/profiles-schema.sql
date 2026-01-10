@@ -1,5 +1,8 @@
--- Supabase SQL: Create profiles table
+-- Supabase SQL: Enhanced profiles table
 -- Run this in your Supabase SQL Editor
+
+-- Drop and recreate if you want a fresh start (CAREFUL: deletes data)
+-- DROP TABLE IF EXISTS profiles;
 
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -13,6 +16,12 @@ CREATE TABLE IF NOT EXISTS profiles (
   activity_level TEXT CHECK (activity_level IN ('sedentary', 'light', 'moderate', 'active', 'very_active')),
   goal TEXT CHECK (goal IN ('cut', 'bulk', 'maintain')),
   
+  -- Diet preferences
+  diet_type TEXT CHECK (diet_type IN ('vegetarian', 'non_vegetarian', 'eggetarian', 'vegan')),
+  gym_frequency INTEGER DEFAULT 0 CHECK (gym_frequency >= 0 AND gym_frequency <= 7),
+  allergies TEXT[] DEFAULT '{}',
+  preferred_cuisine TEXT DEFAULT 'mixed' CHECK (preferred_cuisine IN ('north_indian', 'south_indian', 'gujarati', 'bengali', 'maharashtrian', 'mixed')),
+  
   -- Calculated targets
   bmr INTEGER,
   tdee INTEGER,
@@ -20,8 +29,10 @@ CREATE TABLE IF NOT EXISTS profiles (
   target_protein INTEGER,
   target_carbs INTEGER,
   target_fat INTEGER,
+  target_fiber INTEGER DEFAULT 25,
+  target_water NUMERIC(3,1) DEFAULT 2.5,
   
-  -- Katori calibration (for portion estimation)
+  -- Katori calibration
   katori_size TEXT DEFAULT 'medium' CHECK (katori_size IN ('small', 'medium', 'large')),
   
   -- Status
@@ -35,7 +46,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- Policies: Users can only access their own profile
+-- Policies
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
   USING (auth.uid() = user_id);
@@ -49,5 +60,5 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
--- Create index for faster lookups
+-- Index for faster lookups
 CREATE INDEX IF NOT EXISTS profiles_user_id_idx ON profiles(user_id);

@@ -3,18 +3,30 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-// Types
+// ============================================================
+// Enhanced Onboarding Types
+// ============================================================
+
 export type Gender = "male" | "female";
 export type ActivityLevel = "sedentary" | "light" | "moderate" | "active" | "very_active";
 export type Goal = "cut" | "bulk" | "maintain";
+export type DietType = "vegetarian" | "non_vegetarian" | "eggetarian" | "vegan";
+export type Cuisine = "north_indian" | "south_indian" | "gujarati" | "bengali" | "maharashtrian" | "mixed";
 
 export interface OnboardingData {
+    // Basic info
     age: number;
-    height: number; // in cm
-    weight: number; // in kg
+    height: number; // cm
+    weight: number; // kg
     gender: Gender;
     activity: ActivityLevel;
     goal: Goal;
+
+    // NEW: Diet preferences
+    dietType: DietType;
+    gymFrequency: number; // 0-7 days per week
+    allergies: string[];
+    preferredCuisine: Cuisine;
 }
 
 export interface OnboardingResult {
@@ -27,30 +39,29 @@ export interface OnboardingResult {
         target_protein: number;
         target_carbs: number;
         target_fat: number;
+        target_fiber: number;
+        target_water: number;
     };
 }
 
 // Activity multipliers for TDEE calculation
 const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
-    sedentary: 1.2, // Little or no exercise
-    light: 1.375, // Light exercise 1-3 days/week
-    moderate: 1.55, // Moderate exercise 3-5 days/week
-    active: 1.725, // Hard exercise 6-7 days/week
-    very_active: 1.9, // Very hard exercise, physical job
+    sedentary: 1.2,
+    light: 1.375,
+    moderate: 1.55,
+    active: 1.725,
+    very_active: 1.9,
 };
 
 // Goal-based calorie adjustments
 const GOAL_ADJUSTMENTS: Record<Goal, number> = {
-    cut: -500, // Deficit for weight loss
-    bulk: 300, // Surplus for muscle gain
-    maintain: 0, // Maintenance
+    cut: -500,
+    bulk: 300,
+    maintain: 0,
 };
 
 /**
  * Calculate BMR using Mifflin-St Jeor Equation
- * Men: BMR = 10W + 6.25H - 5A + 5
- * Women: BMR = 10W + 6.25H - 5A - 161
- * W = weight in kg, H = height in cm, A = age in years
  */
 function calculateBMR(weight: number, height: number, age: number, gender: Gender): number {
     const baseBMR = 10 * weight + 6.25 * height - 5 * age;
@@ -58,41 +69,67 @@ function calculateBMR(weight: number, height: number, age: number, gender: Gende
 }
 
 /**
- * Calculate TDEE (Total Daily Energy Expenditure)
+ * Calculate TDEE with gym frequency adjustment
  */
-function calculateTDEE(bmr: number, activity: ActivityLevel): number {
-    return bmr * ACTIVITY_MULTIPLIERS[activity];
+function calculateTDEE(bmr: number, activity: ActivityLevel, gymFrequency: number): number {
+    // Base TDEE from activity level
+    let tdee = bmr * ACTIVITY_MULTIPLIERS[activity];
+
+    // Add extra for gym sessions (approx 200-300 cal per session, averaged over week)
+    if (gymFrequency > 0) {
+        const dailyGymBonus = (gymFrequency * 250) / 7;
+        tdee += dailyGymBonus;
+    }
+
+    return tdee;
 }
 
 /**
- * Calculate macronutrient targets
- * Protein: 2.0g per kg body weight (higher for Indian diet focus)
- * Fat: 25% of total calories
- * Carbs: Remaining calories
+ * Calculate macronutrient targets based on goal and diet type
  */
-function calculateMacros(targetCalories: number, weight: number) {
-    // Protein: 2g per kg of body weight
-    const proteinGrams = Math.round(weight * 2.0);
+function calculateMacros(
+    targetCalories: number,
+    weight: number,
+    goal: Goal,
+    dietType: DietType
+) {
+    // Protein: Higher for gymgoers and bulking
+    let proteinMultiplier = 1.8; // Base: 1.8g per kg
+    if (goal === "bulk") proteinMultiplier = 2.2;
+    if (goal === "cut") proteinMultiplier = 2.0; // Preserve muscle during cut
+    if (dietType === "vegetarian" || dietType === "vegan") {
+        proteinMultiplier += 0.2; // Slightly higher to account for incomplete proteins
+    }
+
+    const proteinGrams = Math.round(weight * proteinMultiplier);
     const proteinCalories = proteinGrams * 4;
 
-    // Fat: 25% of total calories (9 cal per gram)
-    const fatCalories = targetCalories * 0.25;
+    // Fat: 25-30% of calories (higher for keto-friendly, lower for carb-heavy)
+    const fatPercent = goal === "bulk" ? 0.25 : 0.28;
+    const fatCalories = targetCalories * fatPercent;
     const fatGrams = Math.round(fatCalories / 9);
 
-    // Carbs: Remaining calories (4 cal per gram)
+    // Carbs: Remaining calories
     const carbCalories = targetCalories - proteinCalories - fatCalories;
-    const carbGrams = Math.round(carbCalories / 4);
+    const carbGrams = Math.round(Math.max(0, carbCalories) / 4);
+
+    // Fiber: 14g per 1000 cal (adjusted for Indian high-fiber diet)
+    const fiberGrams = Math.round((targetCalories / 1000) * 14);
+
+    // Water: 30-35ml per kg body weight
+    const waterLiters = Math.round((weight * 0.033) * 10) / 10;
 
     return {
         protein: proteinGrams,
         carbs: carbGrams,
         fat: fatGrams,
+        fiber: Math.max(fiberGrams, 25), // Minimum 25g
+        water: Math.max(waterLiters, 2.0), // Minimum 2L
     };
 }
 
 /**
  * Main onboarding server action
- * Calculates targets and saves profile to Supabase
  */
 export async function saveOnboardingProfile(
     data: OnboardingData
@@ -109,10 +146,7 @@ export async function saveOnboardingProfile(
             return { success: false, error: "Weight must be between 30 and 300 kg" };
         }
 
-        // Initialize Supabase client
         const supabase = await createClient();
-
-        // Get authenticated user
         const {
             data: { user },
             error: authError,
@@ -122,15 +156,15 @@ export async function saveOnboardingProfile(
             return { success: false, error: "You must be signed in to complete onboarding" };
         }
 
-        // Calculate BMR and TDEE
+        // Calculate BMR and TDEE (with gym adjustment)
         const bmr = calculateBMR(data.weight, data.height, data.age, data.gender);
-        const tdee = calculateTDEE(bmr, data.activity);
+        const tdee = calculateTDEE(bmr, data.activity, data.gymFrequency);
 
         // Apply goal adjustment
         const targetCalories = Math.round(tdee + GOAL_ADJUSTMENTS[data.goal]);
 
-        // Calculate macros
-        const macros = calculateMacros(targetCalories, data.weight);
+        // Calculate macros (considers diet type)
+        const macros = calculateMacros(targetCalories, data.weight, data.goal, data.dietType);
 
         // Prepare profile data
         const profileData = {
@@ -141,17 +175,25 @@ export async function saveOnboardingProfile(
             gender: data.gender,
             activity_level: data.activity,
             goal: data.goal,
+            // NEW fields
+            diet_type: data.dietType,
+            gym_frequency: data.gymFrequency,
+            allergies: data.allergies,
+            preferred_cuisine: data.preferredCuisine,
+            // Calculated targets
             bmr: Math.round(bmr),
             tdee: Math.round(tdee),
             target_calories: targetCalories,
             target_protein: macros.protein,
             target_carbs: macros.carbs,
             target_fat: macros.fat,
+            target_fiber: macros.fiber,
+            target_water: macros.water,
             onboarding_completed: true,
             updated_at: new Date().toISOString(),
         };
 
-        // Upsert profile (insert or update if exists)
+        // Upsert profile
         const { error: upsertError } = await supabase
             .from("profiles")
             .upsert(profileData, { onConflict: "user_id" });
@@ -161,7 +203,6 @@ export async function saveOnboardingProfile(
             return { success: false, error: "Failed to save profile. Please try again." };
         }
 
-        // Revalidate cached paths
         revalidatePath("/dashboard");
         revalidatePath("/onboarding");
 
@@ -174,6 +215,8 @@ export async function saveOnboardingProfile(
                 target_protein: macros.protein,
                 target_carbs: macros.carbs,
                 target_fat: macros.fat,
+                target_fiber: macros.fiber,
+                target_water: macros.water,
             },
         };
     } catch (error) {
@@ -203,7 +246,6 @@ export async function getUserProfile() {
             .single();
 
         if (error) {
-            // No profile found is not an error - user needs onboarding
             if (error.code === "PGRST116") {
                 return { success: true, data: null };
             }

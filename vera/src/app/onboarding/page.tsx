@@ -3,20 +3,39 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ChevronLeft, Check } from "lucide-react";
+import { ArrowRight, ChevronLeft, Check, Droplets } from "lucide-react";
 import {
     saveOnboardingProfile,
     type Gender,
     type ActivityLevel,
     type Goal,
+    type DietType,
+    type Cuisine,
 } from "@/app/actions/onboarding";
 
 // ──── Types ────
-type Step = "intro" | "basics" | "measurements" | "activity" | "goal" | "results";
+type Step = "intro" | "basics" | "measurements" | "diet" | "activity" | "goal" | "results";
 
-const STEPS: Step[] = ["intro", "basics", "measurements", "activity", "goal", "results"];
+const STEPS: Step[] = ["intro", "basics", "measurements", "diet", "activity", "goal", "results"];
+
+// Allergy options (defined here since server actions can only export functions)
+const ALLERGY_OPTIONS = [
+    { id: "lactose", label: "Lactose Intolerant", emoji: "🥛" },
+    { id: "gluten", label: "Gluten Free", emoji: "🌾" },
+    { id: "nuts", label: "Nut Allergy", emoji: "🥜" },
+    { id: "soy", label: "Soy Allergy", emoji: "🫘" },
+    { id: "shellfish", label: "Shellfish Allergy", emoji: "🦐" },
+    { id: "eggs", label: "Egg Allergy", emoji: "🥚" },
+] as const;
 
 // ──── Options ────
+const DIET_OPTIONS: { value: DietType; emoji: string; label: string }[] = [
+    { value: "vegetarian", emoji: "🥗", label: "Vegetarian" },
+    { value: "non_vegetarian", emoji: "🍗", label: "Non-Vegetarian" },
+    { value: "eggetarian", emoji: "🥚", label: "Eggetarian" },
+    { value: "vegan", emoji: "🌱", label: "Vegan" },
+];
+
 const ACTIVITY_OPTIONS: { value: ActivityLevel; emoji: string; label: string; desc: string }[] = [
     { value: "sedentary", emoji: "🛋️", label: "Sedentary", desc: "Little to no exercise, desk job" },
     { value: "light", emoji: "🚶", label: "Lightly Active", desc: "Light exercise 1-3 days/week" },
@@ -30,6 +49,8 @@ const GOAL_OPTIONS: { value: Goal; emoji: string; label: string; desc: string }[
     { value: "maintain", emoji: "⚖️", label: "Maintain Weight", desc: "Stay at current weight" },
     { value: "bulk", emoji: "💪", label: "Gain Muscle", desc: "Build mass with a surplus" },
 ];
+
+const GYM_OPTIONS = [0, 1, 2, 3, 4, 5, 6, 7];
 
 // ──── Animations ────
 const fadeUp = {
@@ -50,13 +71,16 @@ export default function OnboardingPage() {
     const [error, setError] = useState<string | null>(null);
 
     // Form Data
-    const [name, setName] = useState<string>("Friend");
     const [gender, setGender] = useState<Gender>("male");
     const [age, setAge] = useState<number>(25);
     const [height, setHeight] = useState<number>(170);
     const [weight, setWeight] = useState<number>(70);
+    const [dietType, setDietType] = useState<DietType>("non_vegetarian");
+    const [gymFrequency, setGymFrequency] = useState<number>(3);
+    const [allergies, setAllergies] = useState<string[]>([]);
     const [activity, setActivity] = useState<ActivityLevel>("moderate");
     const [goal, setGoal] = useState<Goal>("maintain");
+    const preferredCuisine: Cuisine = "mixed"; // Default for now
 
     // Results
     const [results, setResults] = useState<{
@@ -64,6 +88,8 @@ export default function OnboardingPage() {
         target_protein: number;
         target_carbs: number;
         target_fat: number;
+        target_fiber: number;
+        target_water: number;
     } | null>(null);
 
     const stepIndex = STEPS.indexOf(currentStep);
@@ -80,8 +106,16 @@ export default function OnboardingPage() {
         if (prevIdx >= 0) setCurrentStep(STEPS[prevIdx]);
     };
 
+    const toggleAllergy = (id: string) => {
+        setAllergies((prev) =>
+            prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
+        );
+    };
+
     const calculatePlan = async () => {
         setLoading(true);
+        setError(null);
+
         const res = await saveOnboardingProfile({
             age,
             height,
@@ -89,6 +123,10 @@ export default function OnboardingPage() {
             gender,
             activity,
             goal,
+            dietType,
+            gymFrequency,
+            allergies,
+            preferredCuisine,
         });
 
         if (res.success && res.data) {
@@ -97,6 +135,8 @@ export default function OnboardingPage() {
                 target_protein: res.data.target_protein,
                 target_carbs: res.data.target_carbs,
                 target_fat: res.data.target_fat,
+                target_fiber: res.data.target_fiber,
+                target_water: res.data.target_water,
             });
             setCurrentStep("results");
         } else {
@@ -114,19 +154,19 @@ export default function OnboardingPage() {
                 <div className="absolute bottom-[-10%] left-[-10%] w-[60vh] h-[60vh] bg-peach/5 blur-3xl rounded-full" />
             </div>
 
-            {/* Progress Bar (Skipped on Intro) */}
+            {/* Progress Bar */}
             {currentStep !== "intro" && (
                 <div className="fixed top-0 left-0 right-0 h-1 bg-white/5 z-50">
                     <motion.div
                         className="h-full bg-gradient-to-r from-terracotta to-peach"
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        transition={{ duration: 0.5 }}
                     />
                 </div>
             )}
 
-            {/* Header (Back Button) */}
+            {/* Header */}
             <header className="p-6 flex justify-between items-center relative z-20">
                 {stepIndex > 0 && currentStep !== "results" ? (
                     <button onClick={prevStep} className="p-2 rounded-full hover:bg-white/5 transition-colors">
@@ -153,11 +193,9 @@ export default function OnboardingPage() {
                             </motion.div>
                             <h1 className="text-4xl font-serif mb-4">Namaste.</h1>
                             <p className="text-xl text-muted-foreground leading-relaxed mb-12">
-                                I'm Vera, your personal nutrition AI. I'm here to help you find your rhythm with food. <br /><br />Let's build a plan that truly fits you.
+                                I'm Vera, your personal nutrition AI.<br /><br />Let's build a plan that fits your lifestyle and diet preferences.
                             </p>
-                            <button onClick={nextStep} className="w-full btn-cinematic text-lg">
-                                Get Started
-                            </button>
+                            <button onClick={nextStep} className="w-full btn-cinematic text-lg">Get Started</button>
                         </motion.div>
                     )}
 
@@ -177,8 +215,7 @@ export default function OnboardingPage() {
                                                 key={g}
                                                 onClick={() => setGender(g)}
                                                 whileHover="hover" whileTap="tap" variants={cardHover}
-                                                className={`h-32 rounded-2xl border-2 flex flex-col items-center justify-center transition-all ${gender === g ? "bg-white/5 border-terracotta shadow-[0_0_20px_rgba(224,122,95,0.1)]" : "bg-transparent border-white/10"
-                                                    }`}
+                                                className={`h-32 rounded-2xl border-2 flex flex-col items-center justify-center transition-all ${gender === g ? "bg-white/5 border-terracotta" : "bg-transparent border-white/10"}`}
                                             >
                                                 <span className="text-3xl mb-2">{g === 'male' ? '👨' : '👩'}</span>
                                                 <span className="font-medium capitalize">{g}</span>
@@ -214,7 +251,6 @@ export default function OnboardingPage() {
                             <p className="text-muted-foreground mb-10">Precision helps me understand your metabolism.</p>
 
                             <div className="space-y-12">
-                                {/* Height */}
                                 <div>
                                     <div className="flex justify-between items-baseline mb-4">
                                         <label className="text-xs uppercase tracking-widest text-white/30">Height</label>
@@ -226,8 +262,6 @@ export default function OnboardingPage() {
                                         className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-terracotta"
                                     />
                                 </div>
-
-                                {/* Weight */}
                                 <div>
                                     <div className="flex justify-between items-baseline mb-4">
                                         <label className="text-xs uppercase tracking-widest text-white/30">Weight</label>
@@ -247,11 +281,82 @@ export default function OnboardingPage() {
                         </motion.div>
                     )}
 
-                    {/* 4. ACTIVITY */}
+                    {/* 4. DIET & PREFERENCES (NEW) */}
+                    {currentStep === "diet" && (
+                        <motion.div key="diet" variants={fadeUp} initial="hidden" animate="visible" exit="exit">
+                            <h2 className="text-3xl font-serif mb-2">Your diet preferences.</h2>
+                            <p className="text-muted-foreground mb-8">Help me suggest meals that fit your lifestyle.</p>
+
+                            <div className="space-y-8 pb-24">
+                                {/* Diet Type */}
+                                <div>
+                                    <label className="text-xs uppercase tracking-widest text-white/30 mb-4 block">Diet Type</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {DIET_OPTIONS.map((opt) => (
+                                            <motion.button
+                                                key={opt.value}
+                                                onClick={() => setDietType(opt.value)}
+                                                whileTap={{ scale: 0.98 }}
+                                                className={`p-4 rounded-xl border flex items-center gap-3 transition-all ${dietType === opt.value ? "bg-white/5 border-terracotta" : "bg-transparent border-white/10"}`}
+                                            >
+                                                <span className="text-2xl">{opt.emoji}</span>
+                                                <span className={dietType === opt.value ? "text-terracotta font-medium" : ""}>{opt.label}</span>
+                                            </motion.button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Gym Frequency */}
+                                <div>
+                                    <div className="flex justify-between items-baseline mb-4">
+                                        <label className="text-xs uppercase tracking-widest text-white/30">Gym Days / Week</label>
+                                        <span className="text-3xl font-serif text-terracotta">{gymFrequency}</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {GYM_OPTIONS.map((n) => (
+                                            <button
+                                                key={n}
+                                                onClick={() => setGymFrequency(n)}
+                                                className={`flex-1 py-3 rounded-xl border text-sm font-medium transition-all ${gymFrequency === n ? "bg-terracotta text-white border-terracotta" : "bg-transparent border-white/10 text-white/60"}`}
+                                            >
+                                                {n}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Allergies */}
+                                <div>
+                                    <label className="text-xs uppercase tracking-widest text-white/30 mb-4 block">Any Allergies/Intolerances?</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {ALLERGY_OPTIONS.map((opt) => (
+                                            <motion.button
+                                                key={opt.id}
+                                                onClick={() => toggleAllergy(opt.id)}
+                                                whileTap={{ scale: 0.98 }}
+                                                className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${allergies.includes(opt.id) ? "bg-terracotta/20 border-terracotta" : "bg-transparent border-white/10"}`}
+                                            >
+                                                <span className="text-xl">{opt.emoji}</span>
+                                                <span className="text-sm">{opt.label}</span>
+                                                {allergies.includes(opt.id) && <Check className="w-4 h-4 text-terracotta ml-auto" />}
+                                            </motion.button>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-white/30 mt-3">Select all that apply, or skip if none.</p>
+                                </div>
+                            </div>
+
+                            <div className="fixed bottom-8 left-0 right-0 px-6 max-w-xl mx-auto bg-background/80 backdrop-blur-xl pt-4">
+                                <button onClick={nextStep} className="w-full btn-cinematic">Next</button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* 5. ACTIVITY */}
                     {currentStep === "activity" && (
                         <motion.div key="activity" variants={fadeUp} initial="hidden" animate="visible" exit="exit">
                             <h2 className="text-3xl font-serif mb-2">How active are you?</h2>
-                            <p className="text-muted-foreground mb-8">Be honest — this changes your daily calorie target significantly.</p>
+                            <p className="text-muted-foreground mb-8">Be honest — this affects your calorie target significantly.</p>
 
                             <div className="space-y-3 pb-24">
                                 {ACTIVITY_OPTIONS.map((opt) => (
@@ -259,16 +364,11 @@ export default function OnboardingPage() {
                                         key={opt.value}
                                         onClick={() => setActivity(opt.value)}
                                         whileTap={{ scale: 0.98 }}
-                                        className={`w-full p-5 rounded-2xl border flex items-center gap-4 text-left transition-all ${activity === opt.value
-                                            ? "bg-white/5 border-terracotta ring-1 ring-terracotta/50"
-                                            : "bg-transparent border-white/10 hover:bg-white/5"
-                                            }`}
+                                        className={`w-full p-5 rounded-2xl border flex items-center gap-4 text-left transition-all ${activity === opt.value ? "bg-white/5 border-terracotta ring-1 ring-terracotta/50" : "bg-transparent border-white/10 hover:bg-white/5"}`}
                                     >
                                         <span className="text-2xl">{opt.emoji}</span>
                                         <div>
-                                            <h3 className={`font-medium ${activity === opt.value ? "text-terracotta" : "text-white"}`}>
-                                                {opt.label}
-                                            </h3>
+                                            <h3 className={`font-medium ${activity === opt.value ? "text-terracotta" : "text-white"}`}>{opt.label}</h3>
                                             <p className="text-sm text-white/40">{opt.desc}</p>
                                         </div>
                                         {activity === opt.value && <Check className="ml-auto w-5 h-5 text-terracotta" />}
@@ -282,7 +382,7 @@ export default function OnboardingPage() {
                         </motion.div>
                     )}
 
-                    {/* 5. GOAL */}
+                    {/* 6. GOAL */}
                     {currentStep === "goal" && (
                         <motion.div key="goal" variants={fadeUp} initial="hidden" animate="visible" exit="exit">
                             <h2 className="text-3xl font-serif mb-2">Your Goal.</h2>
@@ -294,13 +394,9 @@ export default function OnboardingPage() {
                                         key={opt.value}
                                         onClick={() => setGoal(opt.value)}
                                         whileTap={{ scale: 0.98 }}
-                                        className={`p-6 rounded-2xl border flex items-center gap-6 text-left transition-all ${goal === opt.value
-                                            ? "bg-gradient-to-r from-terracotta/10 to-peach/10 border-terracotta"
-                                            : "bg-transparent border-white/10 hover:border-white/20"
-                                            }`}
+                                        className={`p-6 rounded-2xl border flex items-center gap-6 text-left transition-all ${goal === opt.value ? "bg-gradient-to-r from-terracotta/10 to-peach/10 border-terracotta" : "bg-transparent border-white/10 hover:border-white/20"}`}
                                     >
-                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${goal === opt.value ? "bg-terracotta text-white" : "bg-white/10 grayscale"
-                                            }`}>
+                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${goal === opt.value ? "bg-terracotta text-white" : "bg-white/10 grayscale"}`}>
                                             {opt.emoji}
                                         </div>
                                         <div>
@@ -311,6 +407,8 @@ export default function OnboardingPage() {
                                 ))}
                             </div>
 
+                            {error && <p className="text-destructive text-sm mt-4">{error}</p>}
+
                             <div className="fixed bottom-8 left-0 right-0 px-6 max-w-xl mx-auto">
                                 <button onClick={calculatePlan} disabled={loading} className="w-full btn-cinematic">
                                     {loading ? "Calculating Plan..." : "Reveal My Plan"}
@@ -319,20 +417,17 @@ export default function OnboardingPage() {
                         </motion.div>
                     )}
 
-                    {/* 6. RESULTS */}
+                    {/* 7. RESULTS */}
                     {currentStep === "results" && results && (
                         <motion.div key="results" variants={fadeUp} initial="hidden" animate="visible" exit="exit">
                             <div className="text-center mb-8">
                                 <p className="text-xs uppercase tracking-widest text-white/40 mb-2">Recommended Rhythm</p>
-                                <div className="relative inline-block">
-                                    <h2 className="text-6xl font-serif text-white mb-2">{results.target_calories}</h2>
-                                    <span className="text-xl text-terracotta absolute -right-8 top-2 font-serif">*</span>
-                                </div>
+                                <h2 className="text-6xl font-serif text-white mb-2">{results.target_calories}</h2>
                                 <p className="text-white/40">Daily Calories</p>
                             </div>
 
                             {/* Macro Cards */}
-                            <div className="grid grid-cols-3 gap-3 mb-10">
+                            <div className="grid grid-cols-2 gap-3 mb-4">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-terracotta/30 text-center">
                                     <p className="text-[10px] uppercase tracking-widest text-terracotta mb-1">Protein</p>
                                     <p className="text-2xl font-serif">{results.target_protein}g</p>
@@ -345,13 +440,30 @@ export default function OnboardingPage() {
                                     <p className="text-[10px] uppercase tracking-widest text-peach mb-1">Fats</p>
                                     <p className="text-2xl font-serif">{results.target_fat}g</p>
                                 </div>
+                                <div className="p-4 rounded-2xl bg-white/5 border border-green-500/30 text-center">
+                                    <p className="text-[10px] uppercase tracking-widest text-green-400 mb-1">Fiber</p>
+                                    <p className="text-2xl font-serif">{results.target_fiber}g</p>
+                                </div>
+                            </div>
+
+                            {/* Water Target */}
+                            <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-3">
+                                    <Droplets className="w-6 h-6 text-blue-400" />
+                                    <div>
+                                        <p className="text-sm font-medium">Daily Water Intake</p>
+                                        <p className="text-xs text-white/40">Stay hydrated!</p>
+                                    </div>
+                                </div>
+                                <p className="text-2xl font-serif text-blue-400">{results.target_water}L</p>
                             </div>
 
                             <div className="bg-white/5 rounded-2xl p-6 border border-white/10 mb-24">
-                                <h3 className="font-serif text-lg mb-2">💡 Why this plan?</h3>
+                                <h3 className="font-serif text-lg mb-2">💡 Your personalized plan</h3>
                                 <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Based on being a <strong>{age}-year-old {gender}</strong> who is <strong>{activity.replace('_', ' ')}</strong>,
-                                    this rhythm will help you <strong>{goal === 'cut' ? 'lose weight' : goal === 'bulk' ? 'gain muscle' : 'maintain your energy'}</strong> effectively while enjoying your favorite Indian meals.
+                                    As a <strong>{dietType.replace('_', '-')}</strong> who works out <strong>{gymFrequency} days/week</strong>,
+                                    this rhythm will help you <strong>{goal === 'cut' ? 'lose weight' : goal === 'bulk' ? 'gain muscle' : 'maintain energy'}</strong> effectively.
+                                    {allergies.length > 0 && ` I'll avoid suggesting foods with ${allergies.join(', ')}.`}
                                 </p>
                             </div>
 

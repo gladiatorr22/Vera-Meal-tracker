@@ -210,12 +210,12 @@ export function MealEditor({
                 {healthScore && (
                     <div
                         className={`px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide ${healthScore === "excellent"
-                                ? "bg-green-500/20 text-green-400"
-                                : healthScore === "good"
-                                    ? "bg-blue-500/20 text-blue-400"
-                                    : healthScore === "moderate"
-                                        ? "bg-orange-500/20 text-orange-400"
-                                        : "bg-pink-500/20 text-pink-400"
+                            ? "bg-green-500/20 text-green-400"
+                            : healthScore === "good"
+                                ? "bg-blue-500/20 text-blue-400"
+                                : healthScore === "moderate"
+                                    ? "bg-orange-500/20 text-orange-400"
+                                    : "bg-pink-500/20 text-pink-400"
                             }`}
                     >
                         {healthScore}
@@ -270,8 +270,8 @@ export function MealEditor({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, x: -50 }}
                             className={`p-4 rounded-xl border transition-colors ${editingId === item.id
-                                    ? "bg-vera/10 border-vera/30"
-                                    : "bg-muted/30 border-border hover:border-muted-foreground/30"
+                                ? "bg-vera/10 border-vera/30"
+                                : "bg-muted/30 border-border hover:border-muted-foreground/30"
                                 }`}
                         >
                             {editingId === item.id ? (
@@ -443,8 +443,8 @@ export function MealEditor({
                     onClick={handleConfirm}
                     disabled={isSaving || items.length === 0}
                     className={`flex-1 py-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${isSaving || items.length === 0
-                            ? "bg-muted text-muted-foreground cursor-not-allowed"
-                            : "bg-gradient-to-r from-vera to-peach text-background shadow-lg hover:shadow-xl"
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "bg-black text-white shadow-lg hover:shadow-xl hover:scale-[1.01]"
                         }`}
                 >
                     {isSaving ? (

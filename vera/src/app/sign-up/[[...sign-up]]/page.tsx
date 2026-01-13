@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowRight, Eye, EyeOff, Check } from "lucide-react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 const spring = {
@@ -13,15 +14,15 @@ const spring = {
 };
 
 export default function SignUpPage() {
+    const router = useRouter();
     const supabase = createClient();
 
-    const [name, setName] = useState("");
+    const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,7 +34,7 @@ export default function SignUpPage() {
             password,
             options: {
                 data: {
-                    full_name: name,
+                    full_name: fullName,
                 },
             },
         });
@@ -42,12 +43,13 @@ export default function SignUpPage() {
             setError(error.message);
             setLoading(false);
         } else {
-            setSuccess(true);
-            setLoading(false);
+            // Check if email confirmation is required or auto-sign in
+            router.push("/dashboard");
+            router.refresh();
         }
     };
 
-    const handleGoogleSignUp = async () => {
+    const handleGoogleSignIn = async () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
@@ -56,65 +58,35 @@ export default function SignUpPage() {
         });
     };
 
-    // Success State
-    if (success) {
-        return (
-            <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-terracotta/5 rounded-full blur-3xl pointer-events-none" />
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center max-w-sm glass-card p-12"
-                >
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", bounce: 0.5 }}
-                        className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-8 border border-green-500/20"
-                    >
-                        <Check className="w-8 h-8 text-green-500" />
-                    </motion.div>
-                    <h2 className="text-2xl font-serif mb-4">Check your email</h2>
-                    <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
-                        We&apos;ve sent a confirmation link to <strong>{email}</strong>. Please verify your account to continue.
-                    </p>
-                    <Link href="/sign-in" className="text-terracotta hover:text-peach text-sm font-medium">
-                        Back to Sign In
-                    </Link>
-                </motion.div>
-            </div>
-        );
-    }
-
     return (
-        <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-white text-black flex items-center justify-center p-6 relative overflow-hidden">
 
             {/* Background Decor */}
-            <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-peach/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-terracotta/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-100 rounded-full blur-3xl pointer-events-none opacity-50" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-100 rounded-full blur-3xl pointer-events-none opacity-50" />
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-md glass-card p-8 md:p-12 relative z-10"
+                className="w-full max-w-md bg-white p-8 md:p-12 relative z-10 rounded-3xl shadow-xl border border-neutral-100"
             >
                 {/* Header */}
-                <div className="text-center mb-10">
+                <div className="text-center mb-12">
                     <Link href="/" className="inline-block mb-6">
-                        <span className="font-serif italic text-3xl">Vera.</span>
+                        <span className="font-serif italic text-3xl text-black">Vera.</span>
                     </Link>
-                    <h1 className="text-2xl font-serif mb-2">Begin Journey</h1>
-                    <p className="text-muted-foreground text-sm">Create your space for mindless nutrition.</p>
+                    <h1 className="text-2xl font-serif mb-2 text-black">Start Your Journey</h1>
+                    <p className="text-neutral-500 text-sm">Join thousands finding their rhythm.</p>
                 </div>
 
-                {/* Google Sign Up */}
+                {/* Google Sign In */}
                 <motion.button
                     type="button"
                     whileTap={{ scale: 0.98 }}
                     transition={spring}
-                    onClick={handleGoogleSignUp}
-                    className="w-full py-3 rounded-full border border-white/10 font-medium flex items-center justify-center gap-3 hover:bg-white/5 transition-colors mb-8 text-sm"
+                    onClick={handleGoogleSignIn}
+                    className="w-full py-3 rounded-full border border-neutral-200 font-medium flex items-center justify-center gap-3 hover:bg-neutral-50 transition-colors mb-8 text-sm text-black"
                 >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path
@@ -139,53 +111,56 @@ export default function SignUpPage() {
 
                 {/* Divider */}
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="flex-1 h-px bg-white/10" />
-                    <span className="text-white/20 text-xs uppercase tracking-widest">Or with email</span>
-                    <div className="flex-1 h-px bg-white/10" />
+                    <div className="flex-1 h-px bg-neutral-100" />
+                    <span className="text-neutral-400 text-xs uppercase tracking-widest">Or with email</span>
+                    <div className="flex-1 h-px bg-neutral-100" />
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleSignUp} className="space-y-5">
                     {/* Name */}
                     <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-white/40 ml-1">Full Name</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="input-minimal"
-                            required
-                        />
+                        <label className="text-xs uppercase tracking-widest text-neutral-500 ml-1">Full Name</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
+                                required
+                            />
+                        </div>
                     </div>
 
                     {/* Email */}
                     <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-white/40 ml-1">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="input-minimal"
-                            required
-                        />
+                        <label className="text-xs uppercase tracking-widest text-neutral-500 ml-1">Email</label>
+                        <div className="relative">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
+                                required
+                            />
+                        </div>
                     </div>
 
                     {/* Password */}
                     <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-white/40 ml-1">Password</label>
+                        <label className="text-xs uppercase tracking-widest text-neutral-500 ml-1">Password</label>
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="input-minimal pr-10"
-                                minLength={6}
+                                className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all pr-10"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black transition-colors"
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
@@ -197,7 +172,7 @@ export default function SignUpPage() {
                         <motion.p
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-sm text-red-400 text-center bg-red-400/10 p-2 rounded-lg"
+                            className="text-sm text-red-600 text-center bg-red-50 p-2 rounded-lg"
                         >
                             {error}
                         </motion.p>
@@ -209,18 +184,18 @@ export default function SignUpPage() {
                         disabled={loading}
                         whileTap={{ scale: 0.98 }}
                         transition={spring}
-                        className="w-full btn-cinematic mt-4 flex items-center justify-center gap-2"
+                        className="w-full bg-black text-white py-3 rounded-full font-medium hover:bg-neutral-800 transition-colors shadow-lg shadow-black/10 mt-4 flex items-center justify-center gap-2"
                     >
-                        {loading ? "Creating..." : "Create Account"}
+                        {loading ? "Creating Account..." : "Create Account"}
                         {!loading && <ArrowRight className="w-4 h-4" />}
                     </motion.button>
                 </form>
 
                 {/* Footer */}
-                <p className="text-center text-sm text-muted-foreground mt-10">
+                <p className="text-center text-sm text-neutral-500 mt-10">
                     Already have an account?{" "}
-                    <Link href="/sign-in" className="text-terracotta hover:text-peach transition-colors font-medium">
-                        Sign in
+                    <Link href="/sign-in" className="text-blue-600 hover:text-blue-700 transition-colors font-medium">
+                        Log in
                     </Link>
                 </p>
             </motion.div>

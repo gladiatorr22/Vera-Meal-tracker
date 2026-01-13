@@ -16,8 +16,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: stats?.consumed.calories || 0,
             target: stats?.targets.calories || 2000,
             unit: "kcal",
-            color: "text-terracotta",
-            bg: "bg-terracotta/10",
+            color: "text-black",
+            bg: "bg-gray-100",
         },
         {
             label: "Protein",
@@ -25,8 +25,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: stats?.consumed.protein || 0,
             target: stats?.targets.protein || 150,
             unit: "g",
-            color: "text-cream",
-            bg: "bg-cream/10",
+            color: "text-blue-600",
+            bg: "bg-blue-100",
         },
         {
             label: "Carbs",
@@ -34,8 +34,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: stats?.consumed.carbs || 0,
             target: stats?.targets.carbs || 250,
             unit: "g",
-            color: "text-blue-400",
-            bg: "bg-blue-400/10",
+            color: "text-sky-600",
+            bg: "bg-sky-100",
         },
         {
             label: "Fats",
@@ -43,8 +43,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: stats?.consumed.fats || 0,
             target: stats?.targets.fats || 70,
             unit: "g",
-            color: "text-yellow-400",
-            bg: "bg-yellow-400/10",
+            color: "text-indigo-600",
+            bg: "bg-indigo-100",
         },
         {
             label: "Fiber",
@@ -52,8 +52,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: stats?.consumed.fiber || 0,
             target: 30,
             unit: "g",
-            color: "text-green-400",
-            bg: "bg-green-400/10",
+            color: "text-violet-600",
+            bg: "bg-violet-100",
         },
         {
             label: "Water",
@@ -61,8 +61,8 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
             value: (stats?.consumed.water || 0) / 1000, // Convert ml to L? Or glasses?
             target: 2.5, // Liters target
             unit: "L",
-            color: "text-cyan-400",
-            bg: "bg-cyan-400/10",
+            color: "text-cyan-600",
+            bg: "bg-cyan-100",
         },
         // Placeholders for future data
         {
@@ -102,12 +102,12 @@ export function NutrientGrid({ stats }: NutrientGridProps) {
                     </div>
                     <div className="text-2xl font-serif font-medium mb-1">
                         {item.value}
-                        <span className="text-xs font-sans text-white/40 ml-1">{item.unit}</span>
+                        <span className="text-xs font-sans text-neutral-400 ml-1">{item.unit}</span>
                     </div>
-                    <div className="text-xs uppercase tracking-widest text-white/40 mb-2">{item.label}</div>
+                    <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">{item.label}</div>
 
                     {!item.isPlaceholder && (
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min((item.value / item.target) * 100, 100)}%` }}

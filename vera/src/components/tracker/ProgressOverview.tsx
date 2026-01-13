@@ -17,13 +17,13 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
                 {/* Stats Grid Skeleton */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[...Array(4)].map((_, i) => (
-                        <div key={i} className="glass-card p-4 h-24 bg-white/5" />
+                        <div key={i} className="glass-card p-4 h-24 bg-black/5" />
                     ))}
                 </div>
                 {/* Grid Skeleton */}
                 <div className="grid grid-cols-7 gap-2">
                     {[...Array(14)].map((_, i) => (
-                        <div key={i} className="aspect-square rounded-lg bg-white/5" />
+                        <div key={i} className="aspect-square rounded-lg bg-black/5" />
                     ))}
                 </div>
             </div>
@@ -32,7 +32,7 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
 
     if (!stats) {
         return (
-            <div className="text-center py-12 text-white/40 glass-card">
+            <div className="text-center py-12 text-neutral-400 glass-card">
                 No data available for this period.
             </div>
         );
@@ -44,32 +44,32 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
             value: stats.totalCalories.toLocaleString(),
             unit: "kcal",
             icon: Flame,
-            color: "text-terracotta",
-            bg: "bg-terracotta/10",
+            color: "text-black",
+            bg: "bg-gray-100",
         },
         {
             label: "Total Protein",
             value: stats.totalProtein.toLocaleString(),
             unit: "g",
             icon: Zap,
-            color: "text-cream",
-            bg: "bg-cream/10",
+            color: "text-blue-600",
+            bg: "bg-blue-100",
         },
         {
             label: "Total Carbs",
             value: stats.totalCarbs.toLocaleString(),
             unit: "g",
             icon: TrendingUp,
-            color: "text-blue-400",
-            bg: "bg-blue-400/10",
+            color: "text-sky-600",
+            bg: "bg-sky-100",
         },
         {
             label: "Total Fats",
             value: stats.totalFats.toLocaleString(),
             unit: "g",
             icon: Droplet,
-            color: "text-yellow-400",
-            bg: "bg-yellow-400/10",
+            color: "text-indigo-600",
+            bg: "bg-indigo-100",
         },
     ];
 
@@ -99,9 +99,9 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
                             <div className={`absolute top-2 right-2 w-8 h-8 rounded-full ${card.bg} flex items-center justify-center`}>
                                 <Icon className={`w-4 h-4 ${card.color}`} />
                             </div>
-                            <p className="text-xs text-white/40 mb-1">{card.label}</p>
-                            <p className="text-2xl font-serif">{card.value}</p>
-                            <p className="text-xs text-white/30">{card.unit}</p>
+                            <p className="text-xs text-neutral-400 mb-1">{card.label}</p>
+                            <p className="text-2xl font-serif text-black">{card.value}</p>
+                            <p className="text-xs text-neutral-400">{card.unit}</p>
                         </motion.div>
                     );
                 })}
@@ -110,10 +110,10 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
             {/* History Grid */}
             <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-medium text-lg">{stats.period} Breakdown</h3>
-                    <div className="flex gap-4 text-xs text-white/40">
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 bg-terracotta rounded-full" /> Avg Cals</div>
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 bg-cream rounded-full" /> Protein</div>
+                    <h3 className="font-medium text-lg text-black">{stats.period} Breakdown</h3>
+                    <div className="flex gap-4 text-xs text-neutral-400">
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 bg-black rounded-full" /> Avg Cals</div>
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 bg-blue-500 rounded-full" /> Protein</div>
                     </div>
                 </div>
 
@@ -146,28 +146,28 @@ export function ProgressOverview({ stats, isLoading }: ProgressOverviewProps) {
                                 transition={{ delay: i * 0.02 }}
                                 className={`
                                     relative flex flex-col items-center justify-center p-2 rounded-xl border transition-colors
-                                    ${hasData ? "border-white/10" : "border-white/5 bg-white/[0.02]"}
+                                    ${hasData ? "border-black/5" : "border-black/5 bg-black/[0.02]"}
                                     ${isYearView ? "aspect-[4/3]" : "aspect-[3/4]"}
                                 `}
                             >
                                 {/* Heatmap Background */}
                                 {hasData && (
                                     <div
-                                        className="absolute inset-0 bg-terracotta rounded-xl"
+                                        className="absolute inset-0 bg-neutral-200 rounded-xl"
                                         style={{ opacity }}
                                     />
                                 )}
 
-                                <span className="text-xs text-white/40 mb-1 z-10">{subLabel}</span>
-                                <span className={`font-serif z-10 ${isYearView ? "text-lg" : "text-xl"}`}>{label}</span>
+                                <span className="text-xs text-neutral-400 mb-1 z-10">{subLabel}</span>
+                                <span className={`font-serif z-10 text-black ${isYearView ? "text-lg" : "text-xl"}`}>{label}</span>
 
                                 {hasData ? (
                                     <div className="mt-2 text-[10px] text-center z-10 space-y-0.5">
-                                        <div className="text-white/80 font-medium">{day.calories}</div>
-                                        <div className="text-cream">{day.protein}g P</div>
+                                        <div className="text-neutral-900 font-medium">{day.calories}</div>
+                                        <div className="text-blue-600">{day.protein}g P</div>
                                     </div>
                                 ) : (
-                                    <div className="mt-2 w-1 h-1 rounded-full bg-white/10 z-10" />
+                                    <div className="mt-2 w-1 h-1 rounded-full bg-black/10 z-10" />
                                 )}
                             </motion.div>
                         );

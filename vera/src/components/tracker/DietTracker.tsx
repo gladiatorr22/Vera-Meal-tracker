@@ -5,7 +5,6 @@ import { format, addDays, addMonths, addYears, addWeeks, startOfWeek, endOfWeek 
 import {
     ChevronLeft,
     ChevronRight,
-    Plus,
     Check,
     Utensils,
     Coffee,
@@ -210,20 +209,20 @@ export function DietTracker() {
 
             {/* Header with Calendar Filter */}
             <div className="flex items-center justify-between glass-card p-4 relative z-40">
-                <button onClick={() => handleDateChange(-1)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                    <ChevronLeft className="w-5 h-5" />
+                <button onClick={() => handleDateChange(-1)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+                    <ChevronLeft className="w-5 h-5 text-black" />
                 </button>
 
                 <div className="text-center flex-1">
-                    <h2 className="text-xl font-serif">{header.main}</h2>
-                    <p className="text-sm text-white/40">{header.sub}</p>
+                    <h2 className="text-xl font-serif text-black">{header.main}</h2>
+                    <p className="text-sm text-neutral-500">{header.sub}</p>
                 </div>
 
                 {/* Calendar Filter Button */}
                 <div className="relative">
                     <button
                         onClick={() => setShowFilterMenu(!showFilterMenu)}
-                        className={`p-2 rounded-full transition-colors ${showFilterMenu || viewMode === "progress" ? "bg-terracotta/20 text-terracotta" : "hover:bg-white/5"}`}
+                        className={`p-2 rounded-full transition-colors ${showFilterMenu || viewMode === "progress" ? "bg-black/5 text-black" : "hover:bg-black/5 text-black"}`}
                     >
                         <CalendarDays className="w-5 h-5" />
                     </button>
@@ -235,25 +234,25 @@ export function DietTracker() {
                                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="absolute right-0 top-12 z-50 w-48 p-2 border border-white/10 shadow-xl backdrop-blur-2xl rounded-xl bg-zinc-900"
+                                className="absolute right-0 top-12 z-50 w-48 p-2 border border-black/5 shadow-xl backdrop-blur-2xl rounded-xl bg-white/90"
                             >
-                                <p className="text-xs text-white/40 px-3 py-2 uppercase tracking-widest">Track Progress</p>
+                                <p className="text-xs text-neutral-400 px-3 py-2 uppercase tracking-widest">Track Progress</p>
                                 {(["week", "month", "year"] as PeriodFilter[]).map(filter => (
                                     <button
                                         key={filter}
                                         onClick={() => handleFilterSelect(filter)}
                                         className={`w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition-colors ${periodFilter === filter && viewMode === "progress"
-                                            ? "bg-terracotta/20 text-terracotta"
-                                            : "hover:bg-white/5"
+                                            ? "bg-black/5 text-black font-medium"
+                                            : "hover:bg-black/5 text-neutral-600"
                                             }`}
                                     >
                                         By {filter}
                                     </button>
                                 ))}
-                                <hr className="border-white/5 my-2" />
+                                <hr className="border-black/5 my-2" />
                                 <button
                                     onClick={() => { setViewMode("daily"); setShowFilterMenu(false); }}
-                                    className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-white/5"
+                                    className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 text-neutral-600"
                                 >
                                     Daily View
                                 </button>
@@ -262,15 +261,15 @@ export function DietTracker() {
                     </AnimatePresence>
                 </div>
 
-                <button onClick={() => handleDateChange(1)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                    <ChevronRight className="w-5 h-5" />
+                <button onClick={() => handleDateChange(1)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+                    <ChevronRight className="w-5 h-5 text-black" />
                 </button>
             </div>
 
             {/* View Mode Tabs (Optional - Hidden when filter active) */}
             {viewMode === "progress" && (
                 <div className="flex justify-center">
-                    <button onClick={() => setViewMode("daily")} className="text-xs text-terracotta hover:underline">
+                    <button onClick={() => setViewMode("daily")} className="text-xs text-neutral-500 hover:text-black hover:underline transition-colors">
                         Return to Daily Log
                     </button>
                 </div>
@@ -306,7 +305,7 @@ export function DietTracker() {
                         {isLoading ? (
                             <div className="space-y-4">
                                 {[...Array(4)].map((_, i) => (
-                                    <div key={i} className="glass-card h-32 animate-pulse bg-white/5" />
+                                    <div key={i} className="glass-card h-32 animate-pulse bg-black/5" />
                                 ))}
                             </div>
                         ) : (
@@ -324,73 +323,73 @@ export function DietTracker() {
                                         className="glass-card overflow-hidden"
                                     >
                                         {/* Slot Header */}
-                                        <div className="p-4 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                                        <div className="p-4 bg-black/[0.02] border-b border-black/5 flex justify-between items-center">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                                                    <Icon className="w-5 h-5 text-terracotta" />
+                                                <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center">
+                                                    <Icon className="w-5 h-5 text-black" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium">{slot}</h3>
-                                                    <p className="text-xs text-white/40">{totalCals} kcal logged</p>
+                                                    <h3 className="font-medium text-black">{slot}</h3>
+                                                    <p className="text-xs text-neutral-400">{totalCals} kcal logged</p>
                                                 </div>
                                             </div>
                                             <button
-                                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-terracotta/10 text-terracotta hover:bg-terracotta/20 transition-colors text-xs font-medium"
+                                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 text-black hover:bg-black/10 transition-colors text-xs font-medium"
                                             >
-                                                <Plus className="w-3 h-3" />
-                                                Add
+                                                {/* <Plus className="w-3 h-3" /> */}
+                                                <span>+ Add</span>
                                             </button>
                                         </div>
 
                                         {/* Meals List */}
                                         <div className="p-2">
                                             {meals.length === 0 ? (
-                                                <div className="text-center py-8 text-white/20 text-sm">
+                                                <div className="text-center py-8 text-neutral-400 text-sm">
                                                     No meals logged yet.
                                                 </div>
                                             ) : (
                                                 <div className="space-y-1">
                                                     {meals.map((meal) => (
-                                                        <div key={meal.id} className="group relative flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                                        <div key={meal.id} className="group relative flex items-center gap-4 p-3 rounded-xl hover:bg-black/5 transition-colors border border-transparent hover:border-black/5">
                                                             {/* Checkbox */}
                                                             <div className="relative flex items-center">
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={meal.isEaten}
                                                                     onChange={(e) => toggleEaten(slot, meal.id, e.target.checked)}
-                                                                    className="peer w-5 h-5 rounded border-white/20 bg-black/40 checked:bg-terracotta checked:border-terracotta transition-colors cursor-pointer appearance-none border"
+                                                                    className="peer w-5 h-5 rounded border-neutral-300 bg-white checked:bg-black checked:border-black transition-colors cursor-pointer appearance-none border"
                                                                 />
-                                                                <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-black pointer-events-none opacity-0 peer-checked:opacity-100" />
+                                                                <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100" />
                                                             </div>
 
                                                             {/* Content */}
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex justify-between items-start">
-                                                                    <h4 className={`font-medium truncate ${meal.isEaten ? "text-white/40 line-through" : ""}`}>
+                                                                    <h4 className={`font-medium truncate ${meal.isEaten ? "text-neutral-400 line-through" : "text-black"}`}>
                                                                         {meal.name}
                                                                     </h4>
-                                                                    <span className="text-sm font-medium text-white/60 ml-2">{meal.calories}</span>
+                                                                    <span className="text-sm font-medium text-neutral-500 ml-2">{meal.calories}</span>
                                                                 </div>
-                                                                <div className="flex items-center gap-3 text-xs text-white/40 mt-1">
+                                                                <div className="flex items-center gap-3 text-xs text-neutral-400 mt-1">
                                                                     <span>{meal.protein}g P</span>
-                                                                    <span className="w-1 h-1 rounded-full bg-white/20" />
+                                                                    <span className="w-1 h-1 rounded-full bg-neutral-300" />
                                                                     <span>{meal.carbs}g C</span>
-                                                                    <span className="w-1 h-1 rounded-full bg-white/20" />
+                                                                    <span className="w-1 h-1 rounded-full bg-neutral-300" />
                                                                     <span>{meal.fats}g F</span>
                                                                 </div>
                                                             </div>
 
                                                             {/* Time */}
                                                             {meal.isEaten && meal.eatenAt && (
-                                                                <span className="text-xs text-terracotta font-medium">{meal.eatenAt}</span>
+                                                                <span className="text-xs text-neutral-400 font-medium">{meal.eatenAt}</span>
                                                             )}
 
                                                             {/* Actions */}
                                                             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                                                <button className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
+                                                                <button className="p-2 rounded-lg hover:bg-black/5 text-neutral-400 hover:text-black transition-colors">
                                                                     <Edit2 className="w-3 h-3" />
                                                                 </button>
-                                                                <button className="p-2 rounded-lg hover:bg-destructive/10 text-white/40 hover:text-destructive transition-colors">
+                                                                <button className="p-2 rounded-lg hover:bg-destructive/10 text-neutral-400 hover:text-destructive transition-colors">
                                                                     <Trash2 className="w-3 h-3" />
                                                                 </button>
                                                             </div>

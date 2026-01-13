@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   WARM EARTH PREMIUM DESIGN SYSTEM - VERA AI
-   Editorial, Organic Luxury, Deep Matte Black, Soft Terracotta
+   MINIMALIST BLACK & WHITE DESIGN SYSTEM - VERA AI
+   Clean, Sharp, Clinical Precision, Cold Accents
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @theme inline {
@@ -24,56 +24,60 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-destructive: var(--destructive);
 
-  /* Warm Earth Palette */
-  --color-terracotta: #E07A5F;
-  --color-peach: #F4A261;
-  --color-cream: #F5F2E8;
-  --color-beige: #D4C5B0;
-  --color-charcoal: #1C1C1E;
+  /* Cold Accents Palette */
+  --color-ice-blue: #E0F2FE;
+  --color-cool-gray: #F3F4F6;
+  --color-arctic-teal: #ccfbf1;
+  
+  /* Nutrient Colors */
+  --color-protein: #2563EB;
+  --color-carbs: #0EA5E9;
+  --color-fats: #6366F1;
+  --color-fiber: #8B5CF6;
+  --color-water: #06B6D4;
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-cursive);
-  /* Cormorant Garamond */
   --font-mono: var(--font-geist-mono);
 
-  /* Radii - Soft organic curves */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
+  /* Radii - Sharp & Clean */
+  --radius-sm: 0.3rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   COLOR SYSTEM - Deep Matte Black Mode
+   COLOR SYSTEM - Light Mode Default
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Matte Black Background */
-  --background: #0A0A0A;
-  --foreground: #F5F2E8;
+  /* Pure White Background */
+  --background: #FFFFFF;
+  --foreground: #0A0A0A;
 
-  /* Frosted Glass Cards */
-  --card: rgba(28, 28, 30, 0.6);
-  --card-foreground: #F5F2E8;
+  /* Clean White Cards */
+  --card: #FFFFFF;
+  --card-foreground: #0A0A0A;
 
   /* Muted Text */
-  --muted: #2C2C2E;
-  --muted-foreground: #A19F9D;
+  --muted: #F5F5F7;
+  --muted-foreground: #737373;
 
   /* Borders - Soft Grey */
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: #E07A5F;
+  --border: #E5E5E5;
+  --input: #F5F5F7;
+  --ring: #0A0A0A;
 
-  /* Primary Accent - Terracotta */
-  --primary: #E07A5F;
-  --primary-foreground: #0A0A0A;
+  /* Primary Accent - Black */
+  --primary: #0A0A0A;
+  --primary-foreground: #FFFFFF;
 
-  /* Secondary Accent - Dusted Peach */
-  --secondary: #F4A261;
+  /* Secondary Accent - Light Gray */
+  --secondary: #F5F5F7;
   --secondary-foreground: #0A0A0A;
 
   /* Destructive */
@@ -91,15 +95,12 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    /* Soft Grain Texture Overlay */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-    background-attachment: fixed;
   }
 
-  /* Selection - Warm Highlight */
+  /* Selection - Cold Highlight */
   ::selection {
-    background: rgba(224, 122, 95, 0.3);
-    color: #F5F2E8;
+    background: #E0F2FE;
+    color: #0A0A0A;
   }
 
   h1,
@@ -108,7 +109,7 @@
   h4,
   h5,
   h6 {
-    @apply font-serif font-light;
+    @apply font-serif font-medium text-black;
   }
 }
 
@@ -122,24 +123,26 @@
   .text-display {
     font-size: clamp(3rem, 10vw, 6rem);
     line-height: 0.95;
-    letter-spacing: -0.02em;
-    @apply font-serif font-light italic;
+    letter-spacing: -0.04em;
+    @apply font-serif font-medium text-black;
   }
 
   /* Hero Subtitle */
   .text-display-sub {
     font-family: var(--font-sans);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     font-size: 0.875rem;
     color: var(--muted-foreground);
+    @apply font-medium;
   }
 
   /* Section Headings */
   .text-title {
     font-size: clamp(2rem, 5vw, 3.5rem);
     line-height: 1.1;
-    @apply font-serif font-light;
+    letter-spacing: -0.02em;
+    @apply font-serif font-medium text-black;
   }
 
   /* Body Text */
@@ -147,7 +150,7 @@
     font-size: 1.125rem;
     line-height: 1.6;
     color: var(--muted-foreground);
-    @apply font-sans font-light;
+    @apply font-sans font-normal;
   }
 }
 
@@ -157,61 +160,31 @@
 
 @layer utilities {
 
-  /* Frosted Glass Card */
+  /* Clean Card */
   .glass-card {
-    @apply bg-card backdrop-blur-xl border border-border rounded-2xl;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    @apply bg-white/80 border border-black/5 rounded-2xl shadow-sm backdrop-blur-xl;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
   }
 
-  /* Cinematic Button */
+  /* Minimalist Button */
   .btn-cinematic {
-    @apply relative overflow-hidden px-8 py-4 rounded-full;
-    @apply bg-primary text-primary-foreground font-sans font-medium tracking-wide;
-    @apply transition-all duration-500 ease-out;
-    background: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%);
-  }
-
-  .btn-cinematic:hover {
-    box-shadow: 0 0 20px rgba(224, 122, 95, 0.4);
-    @apply scale-105;
+    @apply relative overflow-hidden px-8 py-3 rounded-xl;
+    @apply bg-black text-white font-sans font-medium tracking-wide;
+    @apply transition-all duration-300 hover:bg-neutral-800 hover:scale-[1.02];
   }
 
   /* Outline Button */
   .btn-outline-warm {
-    @apply px-8 py-4 rounded-full border border-white/20;
-    @apply text-foreground font-sans font-medium tracking-wide;
-    @apply transition-all duration-300 hover:bg-white/5;
-  }
-
-  /* Gradient Text */
-  .text-gradient-warm {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(to right, #F5F2E8, #D4C5B0);
-  }
-
-  .text-gradient-accent {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(to right, #E07A5F, #F4A261);
-  }
-
-  /* Macro Ring Gradients */
-  .bg-gradient-protein {
-    background: linear-gradient(135deg, #E07A5F, #E76F51);
-  }
-
-  .bg-gradient-carbs {
-    background: linear-gradient(135deg, #F5F2E8, #E9E3D5);
-  }
-
-  .bg-gradient-fat {
-    background: linear-gradient(135deg, #F4A261, #E9C46A);
+    @apply px-8 py-3 rounded-xl border border-black/10;
+    @apply text-black font-sans font-medium tracking-wide;
+    @apply transition-all duration-300 hover:bg-black/5;
   }
 
   /* Input Fields */
   .input-minimal {
-    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3;
-    @apply text-foreground placeholder-white/20 transition-all duration-300;
-    @apply focus:outline-none focus:border-white/30 focus:bg-white/10;
+    @apply w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3;
+    @apply text-black placeholder-neutral-400 transition-all duration-300;
+    @apply focus:outline-none focus:border-black focus:ring-1 focus:ring-black/10 focus:bg-white;
   }
 }
 
@@ -237,7 +210,7 @@
     }
 
     50% {
-      transform: translateY(-15px);
+      transform: translateY(-10px);
     }
   }
 }

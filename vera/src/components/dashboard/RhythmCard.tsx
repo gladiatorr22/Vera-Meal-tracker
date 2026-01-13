@@ -9,9 +9,9 @@ export function RhythmCard({ stats }: { stats: DailyStats | null }) {
     const getProgress = (consumed: number, target: number) =>
         Math.min((consumed / (target || 1)) * 100, 100);
 
-    const proteinProps = { val: stats?.consumed.protein || 0, target: stats?.targets.protein || 150, color: "bg-terracotta" };
-    const carbsProps = { val: stats?.consumed.carbs || 0, target: stats?.targets.carbs || 250, color: "bg-cream" };
-    const fatProps = { val: stats?.consumed.fats || 0, target: stats?.targets.fats || 70, color: "bg-peach" };
+    const proteinProps = { val: stats?.consumed.protein || 0, target: stats?.targets.protein || 150, color: "bg-blue-600" };
+    const carbsProps = { val: stats?.consumed.carbs || 0, target: stats?.targets.carbs || 250, color: "bg-sky-400" };
+    const fatProps = { val: stats?.consumed.fats || 0, target: stats?.targets.fats || 70, color: "bg-indigo-500" };
 
     const proteinPct = getProgress(proteinProps.val, proteinProps.target);
     const carbsPct = getProgress(carbsProps.val, carbsProps.target);
@@ -27,7 +27,7 @@ export function RhythmCard({ stats }: { stats: DailyStats | null }) {
             {/* Header */}
             <div className="w-full flex justify-between items-center mb-6">
                 <h2 className="text-lg font-serif">Today's Rhythm</h2>
-                <span className="text-xs text-white/40">{Math.round((stats?.consumed.calories || 0) / (stats?.targets.calories || 2000) * 100)}%</span>
+                <span className="text-xs text-neutral-400">{Math.round((stats?.consumed.calories || 0) / (stats?.targets.calories || 2000) * 100)}%</span>
             </div>
 
             {/* Visual: Concentric Rings */}
@@ -35,32 +35,32 @@ export function RhythmCard({ stats }: { stats: DailyStats | null }) {
                 <div className="relative aspect-square w-full flex items-center justify-center">
                     <svg viewBox="0 0 200 200" className="w-full h-full -rotate-90">
                         {/* Protein Ring (Outer) */}
-                        <circle cx="100" cy="100" r={rProtein} fill="none" stroke="#1c1c1e" strokeWidth="12" />
+                        <circle cx="100" cy="100" r={rProtein} fill="none" stroke="#f5f5f5" strokeWidth="12" />
                         <motion.circle
                             initial={{ strokeDashoffset: cProtein }}
                             animate={{ strokeDashoffset: cProtein - (proteinPct / 100) * cProtein }}
                             transition={{ duration: 1, ease: "easeOut" }}
-                            cx="100" cy="100" r={rProtein} fill="none" stroke="#E07A5F" strokeWidth="12"
+                            cx="100" cy="100" r={rProtein} fill="none" stroke="#2563EB" strokeWidth="12"
                             strokeDasharray={cProtein} strokeLinecap="round"
                         />
 
                         {/* Carbs Ring (Middle) */}
-                        <circle cx="100" cy="100" r={rCarbs} fill="none" stroke="#1c1c1e" strokeWidth="12" />
+                        <circle cx="100" cy="100" r={rCarbs} fill="none" stroke="#f5f5f5" strokeWidth="12" />
                         <motion.circle
                             initial={{ strokeDashoffset: cCarbs }}
                             animate={{ strokeDashoffset: cCarbs - (carbsPct / 100) * cCarbs }}
                             transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
-                            cx="100" cy="100" r={rCarbs} fill="none" stroke="#F5F2E8" strokeWidth="12"
+                            cx="100" cy="100" r={rCarbs} fill="none" stroke="#38BDF8" strokeWidth="12"
                             strokeDasharray={cCarbs} strokeLinecap="round"
                         />
 
                         {/* Fat Ring (Inner) */}
-                        <circle cx="100" cy="100" r={rFats} fill="none" stroke="#1c1c1e" strokeWidth="12" />
+                        <circle cx="100" cy="100" r={rFats} fill="none" stroke="#f5f5f5" strokeWidth="12" />
                         <motion.circle
                             initial={{ strokeDashoffset: cFats }}
                             animate={{ strokeDashoffset: cFats - (fatPct / 100) * cFats }}
                             transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                            cx="100" cy="100" r={rFats} fill="none" stroke="#F4A261" strokeWidth="12"
+                            cx="100" cy="100" r={rFats} fill="none" stroke="#6366F1" strokeWidth="12"
                             strokeDasharray={cFats} strokeLinecap="round"
                         />
                     </svg>
@@ -69,7 +69,7 @@ export function RhythmCard({ stats }: { stats: DailyStats | null }) {
                 {/* Text Below */}
                 <div className="flex flex-col items-center mt-2">
                     <span className="text-4xl font-serif font-medium">{stats?.consumed.calories || 0}</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Calories</span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mt-1">Calories</span>
                 </div>
             </div>
 
@@ -83,16 +83,16 @@ export function RhythmCard({ stats }: { stats: DailyStats | null }) {
                     <div key={macro.label} className="w-full">
                         <div className="flex justify-between items-end mb-2">
                             <h4 className="text-sm font-medium flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${macro.color.replace('bg-', 'bg-')}`} />
+                                <div className={`w-2 h-2 rounded-full ${macro.color}`} />
                                 {macro.label}
                             </h4>
                             <div className="text-right">
                                 <span className="text-sm font-serif">{macro.val}</span>
-                                <span className="text-xs text-white/40"> / {macro.target}g</span>
+                                <span className="text-xs text-neutral-400"> / {macro.target}g</span>
                             </div>
                         </div>
                         {/* Bar container */}
-                        <div className="h-2 bg-white/5 rounded-full overflow-hidden relative">
+                        <div className="h-2 bg-black/5 rounded-full overflow-hidden relative">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${macro.pct}%` }}

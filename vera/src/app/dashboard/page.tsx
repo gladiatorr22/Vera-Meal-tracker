@@ -237,15 +237,15 @@ export default function Dashboard() {
             {/* Cinematic Header */}
             <header className="flex items-center justify-between mb-8 md:mb-12 pt-2 md:pt-4">
                 <div>
-                    <h1 className="text-2xl md:text-4xl font-serif font-light">
-                        Good evening, <span className="italic text-terracotta block md:inline">{firstName}</span>
+                    <h1 className="text-2xl md:text-4xl font-serif font-light text-black">
+                        Good evening, <span className="italic text-black block md:inline border-b border-black">{firstName}</span>
                     </h1>
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 rounded-full border border-white/5">
-                        <Flame className="w-3 h-3 md:w-4 md:h-4 text-peach" />
-                        <span className="text-xs md:text-sm font-medium">{stats?.streak || 0} Day Streak</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/5 rounded-full border border-black/5">
+                        <Flame className="w-3 h-3 md:w-4 md:h-4 text-black" />
+                        <span className="text-xs md:text-sm font-medium text-black">{stats?.streak || 0} Day Streak</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -254,7 +254,7 @@ export default function Dashboard() {
                             whileTap={{ scale: 0.95 }}
                             transition={spring}
                             onClick={() => setIsProfileOpen(true)}
-                            className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden hover:border-white/20 transition-colors"
+                            className="w-10 h-10 rounded-full border border-black/10 bg-white flex items-center justify-center overflow-hidden hover:border-black/20 transition-colors"
                         >
                             {user?.user_metadata?.avatar_url ? (
                                 <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
@@ -267,7 +267,7 @@ export default function Dashboard() {
                             whileTap={{ scale: 0.95 }}
                             transition={spring}
                             onClick={handleSignOut}
-                            className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors text-white/40 hover:text-white"
+                            className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center hover:bg-black/5 transition-colors text-neutral-400 hover:text-black"
                         >
                             <LogOut className="w-4 h-4 md:w-5 md:h-5" />
                         </motion.button>
@@ -314,14 +314,14 @@ export default function Dashboard() {
                                         <h2 className="text-xl md:text-2xl font-serif">Capture Meal</h2>
 
                                         {/* Input Tabs */}
-                                        <div className="flex bg-black/40 rounded-full p-1 border border-white/5 self-start md:self-auto">
+                                        <div className="flex bg-neutral-100 rounded-full p-1 border border-black/5 self-start md:self-auto">
                                             {inputModes.map((mode) => (
                                                 <button
                                                     key={mode.id}
                                                     onClick={() => handleModeChange(mode.id)}
                                                     className={`relative px-4 py-2 md:px-5 rounded-full text-[10px] md:text-xs font-medium uppercase tracking-wide transition-all ${activeMode === mode.id && mode.id !== "barcode"
-                                                        ? "text-black bg-white"
-                                                        : "text-white/40 hover:text-white"
+                                                        ? "text-white bg-black shadow-md"
+                                                        : "text-neutral-500 hover:text-black"
                                                         }`}
                                                 >
                                                     <div className="flex items-center gap-2">
@@ -334,7 +334,7 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Input Area */}
-                                    <div className="flex-1 rounded-2xl border border-white/5 bg-black/20 relative flex items-center justify-center overflow-hidden">
+                                    <div className="flex-1 rounded-2xl border border-black/5 bg-neutral-50 relative flex items-center justify-center overflow-hidden">
                                         <AnimatePresence mode="wait">
                                             {activeMode === "photo" && (
                                                 <motion.div
@@ -394,15 +394,15 @@ export default function Dashboard() {
                                     disabled={!hasContent || isAnalyzing}
                                     onClick={handleAnalyze}
                                     className={`w-full py-4 md:py-6 rounded-2xl font-medium tracking-wide transition-all flex items-center justify-between px-6 md:px-8 text-base md:text-lg ${hasContent && !isAnalyzing
-                                        ? "bg-gradient-to-r from-terracotta to-peach text-black shadow-[0_0_30px_rgba(224,122,95,0.3)]"
-                                        : "bg-white/5 text-white/20 cursor-not-allowed border border-white/5"
+                                        ? "bg-black text-white shadow-lg hover:shadow-xl hover:scale-[1.01]"
+                                        : "bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         {isAnalyzing ? (
                                             <Loader2 className="w-5 h-5 animate-spin" />
                                         ) : (
-                                            <Zap className={`w-5 h-5 ${hasContent ? "fill-black" : ""}`} />
+                                            <Zap className={`w-5 h-5 ${hasContent ? "fill-white" : ""}`} />
                                         )}
                                         {isAnalyzing ? "Analyzing..." : hasContent ? "Analyze Rhythm" : "Add content to analyze"}
                                     </div>
